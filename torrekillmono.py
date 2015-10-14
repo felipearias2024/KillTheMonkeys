@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 import pilasengine
 import random
+import time
 
+pilas = pilasengine.iniciar()
+pilas.fondos.Cesped()
 TIEMPO = 6
 fin_de_juego = False
 
-pilas = pilasengine.iniciar()
 # Usar un fondo estándar
-pilas.fondos.Pasto()
 # Añadir un marcador
 puntos = pilas.actores.Puntaje(x=230, y=200, color=pilas.colores.blanco)
 puntos.magnitud = 40
@@ -20,16 +21,17 @@ balas_simples = pilas.actores.Bala
 monos = []
 
 # Funciones
-def mono_destruido():
-    pass
-
+# Actualizar el marcador con un efecto bonito
 
 def crear_mono():
     # Crear un enemigo nuevo
-    enemigo = pilas.actores.Mono()
+    enemigo=pilas.actores.Mono()
+    kawaii=random.uniform(0.25, 0.75)
+    enemigo.escala=[1.25,kawaii, 1, ]
+    enemigo.rotacion=[360]
     # Hacer que se aparición sea con un efecto bonito
-    ##la escala varíe entre 0,25 y 0,75 (Ojo con el radio de colisión)
     enemigo.escala = .5
+    ##la escala varíe entre 0,25 y 0,75 (Ojo con el radio de colisión)
     # Dotarle de la habilidad de que explote al ser alcanzado por un disparo
     enemigo.aprender(pilas.habilidades.PuedeExplotar)
     # Situarlo en una posición al azar, no demasiado cerca del jugador
@@ -65,15 +67,28 @@ def crear_mono():
         return False
     else:
         return True
-
+def mono_destruido(disparo,enemigo):
+    enemigo.eliminar()
+    disparo.eliminar()
+    puntos.aumentar()
+    puntos.escala=[1,0,5,1]
+    
+def fin_juego(torreta, enemigo):
+    global fin_de_juego
+    enemigo.sonreir()
+    torreta.eliminar()
+    
+    fin_de_juego = True
+    pilas.avisar("Tu puntaje fue %d puntos"%(puntos.obtener()))
+    pilas.actores.Texto("quebraw")
 
 # Añadir la torreta del jugador
 
-torreta = pilas.actores.Torreta(enemigos=monos, cuando_elimina_enemigo=mono_destruido)
+torreta = pilas.actores.Torreta(enemigos=monos, municion_bala_simple="Humo", cuando_elimina_enemigo=mono_destruido)
 
 pilas.tareas.agregar(1, crear_mono)
 #pilas.mundo.agregar_tarea(1, crear_mono) <-- sintaxis vieja
 
 
-# Arrancar el juego
+pilas.colisiones.agregar(torreta, monos, fin_juego)
 pilas.ejecutar()
