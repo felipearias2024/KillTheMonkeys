@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 import pilasengine
 import random
-import time
 
+#torre kill monkey
 pilas = pilasengine.iniciar()
 pilas.fondos.Cesped()
 TIEMPO = 6
@@ -27,7 +27,7 @@ def crear_mono():
     # Crear un enemigo nuevo
     enemigo=pilas.actores.Mono()
     kawaii=random.uniform(0.25, 0.75)
-    enemigo.escala=[1.25,kawaii, 1, ]
+    enemigo.escala=[0.75,kawaii, 1, ]
     enemigo.rotacion=[360]
     # Hacer que se aparición sea con un efecto bonito
     enemigo.escala = .5
@@ -84,7 +84,7 @@ def fin_juego(torreta, enemigo):
 
 # Añadir la torreta del jugador
 
-torreta = pilas.actores.Torreta(enemigos=monos, municion_bala_simple="Humo", cuando_elimina_enemigo=mono_destruido)
+torreta = pilas.actores.Torreta(enemigos=monos, municion_bala_simple="Moneda", cuando_elimina_enemigo=mono_destruido)
 
 pilas.tareas.agregar(1, crear_mono)
 #pilas.mundo.agregar_tarea(1, crear_mono) <-- sintaxis vieja
