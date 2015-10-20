@@ -26,8 +26,8 @@ monos = []
 def crear_mono():
     # Crear un enemigo nuevo
     enemigo=pilas.actores.Mono()
-    kawaii=random.uniform(0.25, 0.75)
-    enemigo.escala=[0.75,kawaii, 1, ]
+    efecto_bonito=random.uniform(0.25, 0.75)
+    enemigo.escala=[0.75,efecto_bonito, 1, ]
     enemigo.rotacion=[360]
     # Hacer que se aparición sea con un efecto bonito
     enemigo.escala = .5
@@ -62,11 +62,20 @@ def crear_mono():
     #enemigo.y = pilas.interpolar(0, tiempo,tipo=random.choice(tipo_interpolacion))
     # Añadirlo a la lista de enemigos
     monos.append(enemigo)
+
+
+    if  random.randrange(0,20)>15:
+        if torreta.municion!=pilasengine.actores.Misil:
+            estrella=pilas.actores.Estrella(x, y)
+            estrella.escala=[1,0,1],.1
+            pilas.colisiones.agregar(estrella,torreta.habilidades.DispararConClick.proyectiles,asignar_arma_mejorada)
+            pilas.tareas.agregar(3, eliminar_estrella, estrella)
     # Permitir la creación de enemigos mientras el juego esté en activo
     if fin_de_juego:
         return False
     else:
         return True
+
 def mono_destruido(disparo,enemigo):
     enemigo.eliminar()
     disparo.eliminar()
@@ -80,11 +89,31 @@ def fin_juego(torreta, enemigo):
     
     fin_de_juego = True
     pilas.avisar("Tu puntaje fue %d puntos"%(puntos.obtener()))
-    pilas.actores.Texto("quebraw")
+    pilas.actores.Texto("JUEGO TERMINADO")
+
+
+def asignar_arma_simple():
+    torreta.municion=pilasengine.actores.Bala
+
+def asignar_arma_mejorada(estrella, proyectil):
+    global torreta
+    torreta.municion=pilasengine.actores.Estrella
+    estrella.eliminar()
+    pilas.tareas.agregar(10, asignar_arma_simple)
+    pilas.avisar("MEJORA DE MUNICION")
+
+def eliminar_estrella(estrella):
+    estrella.eliminar()
+    
+	
 
 # Añadir la torreta del jugador
 
-torreta = pilas.actores.Torreta(enemigos=monos, municion_bala_simple="Moneda", cuando_elimina_enemigo=mono_destruido)
+torreta = pilas.actores.Torreta(enemigos=monos, cuando_elimina_enemigo=mono_destruido)
+torreta.municion=pilasengine.actores.Bala
+
+
+
 
 pilas.tareas.agregar(1, crear_mono)
 #pilas.mundo.agregar_tarea(1, crear_mono) <-- sintaxis vieja
